@@ -9,7 +9,6 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Process
 import android.util.Log
-import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
@@ -34,13 +33,13 @@ public class AudioStreamerPlugin : FlutterPlugin, RequestPermissionsResultListen
 
     private var currentActivity: Activity? = null
 
-    override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
         val messenger = flutterPluginBinding.getFlutterEngine().getDartExecutor()
         val eventChannel = EventChannel(messenger, eventChannelName)
         eventChannel.setStreamHandler(AudioStreamerPlugin());
     }
 
-    override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
+    override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     }
 
     override fun onDetachedFromActivity() {

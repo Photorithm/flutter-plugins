@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:audio_streamer/audio_streamer.dart';
 import 'dart:math';
 
+import 'package:audio_streamer/audio_streamer.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 void main() {
@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
 
   void start() async {
     try {
-      _streamer.start(onAudio, handleError);
+      _streamer.stream!.listen(onAudio, onError: handleError);
       setState(() {
         _isRecording = true;
       });
@@ -52,10 +52,9 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-  void stop() async {
-    bool stopped = await _streamer.stop();
+  void stop() {
     setState(() {
-      _isRecording = stopped;
+      _isRecording = false;
     });
   }
 

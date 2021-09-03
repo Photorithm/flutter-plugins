@@ -34,7 +34,7 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         return
     }
       // To be implemented.
-    eventSink!(FlutterError(code: "100", message: "Recording was interrupted", details: "Another process interrupted recording."))
+    // eventSink!(FlutterError(code: "100", message: "Recording was interrupted", details: "Another process interrupted recording."))
   }
 
     // Handle stream emitting (Swift => Flutter)
