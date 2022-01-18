@@ -13,7 +13,6 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
   public static func register(with registrar: FlutterPluginRegistrar) {
     let instance = SwiftAudioStreamerPlugin()
     
-
     // Set flutter communication channel for emitting updates
     let eventChannel = FlutterEventChannel.init(name: "audio_streamer.eventChannel", binaryMessenger: registrar.messenger())
     eventChannel.setStreamHandler(instance)
@@ -34,7 +33,7 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         return
     }
       // To be implemented.
-    // eventSink!(FlutterError(code: "100", message: "Recording was interrupted", details: "Another process interrupted recording."))
+    eventSink!(FlutterError(code: "100", message: "Recording was interrupted", details: "Another process interrupted recording."))
   }
 
     // Handle stream emitting (Swift => Flutter)
@@ -51,8 +50,7 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
     public func onListen(withArguments arguments: Any?,
       eventSink: @escaping FlutterEventSink) -> FlutterError? {
         self.eventSink = eventSink
-        startRecording()
-        return nil
+        return startRecording()
     }
 
     // Event Channel: On Stream Cancelled
@@ -66,8 +64,12 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
     func startRecording() {
         engine = AVAudioEngine()
       
-        try! AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playAndRecord, options: .mixWithOthers)
-        try! AVAudioSession.sharedInstance().setActive(true)
+        do {
+          try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playAndRecord, options: .mixWithOthers)
+          try AVAudioSession.sharedInstance().setActive(true)
+        } catch {
+          return FlutterError(code: "100", message: "Recording failed to start", details: "Encountered unexpected error \(error)")
+        }
       
         let input = engine.inputNode
         let bus = 0
@@ -80,6 +82,7 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         }
 
         try! engine.start()
+        return nil
     }
 
 }
