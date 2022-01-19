@@ -61,7 +61,7 @@ public class SwiftAudioStreamerPlugin: NSObject, FlutterPlugin, FlutterStreamHan
         return nil
     }
 
-    func startRecording() {
+    func startRecording() -> FlutterError? {
         engine = AVAudioEngine()
       
         do {
