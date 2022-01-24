@@ -97,35 +97,40 @@ public class AudioStreamerPlugin : FlutterPlugin, RequestPermissionsResultListen
      */
     private fun streamMicData() {
         Thread(Runnable {
-            Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO)
-            val audioBuffer = ShortArray(bufferSize / 2)
-            val record = AudioRecord(
-                    MediaRecorder.AudioSource.DEFAULT,
-                    sampleRate,
-                    AudioFormat.CHANNEL_IN_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    bufferSize)
-            if (record.state != AudioRecord.STATE_INITIALIZED) {
-                Log.e(logTag, "Audio Record can't initialize!")
-                return@Runnable
-            }
-            /** Start recording loop  */
-            record.startRecording()
-            while (recording) {
-                /** Read data into buffer  */
-                record.read(audioBuffer, 0, audioBuffer.size)
-                Handler(Looper.getMainLooper()).post {
-                    /// Convert to list in order to send via EventChannel.
-                    val audioBufferList = ArrayList<Double>()
-                    for (impulse in audioBuffer) {
-                        val normalizedImpulse = impulse.toDouble() / maxAmplitude.toDouble()
-                        audioBufferList.add(normalizedImpulse)
-                    }
-                    eventSink!!.success(audioBufferList)
+            try {
+
+                Process.setThreadPriority(Process.THREAD_PRIORITY_AUDIO)
+                val audioBuffer = ShortArray(bufferSize / 2)
+                val record = AudioRecord(
+                        MediaRecorder.AudioSource.DEFAULT,
+                        sampleRate,
+                        AudioFormat.CHANNEL_IN_MONO,
+                        AudioFormat.ENCODING_PCM_16BIT,
+                        bufferSize)
+                if (record.state != AudioRecord.STATE_INITIALIZED) {
+                    Log.e(logTag, "Audio Record can't initialize!")
+                    return@Runnable
                 }
+                /** Start recording loop  */
+                record.startRecording()
+                while (recording) {
+                    /** Read data into buffer  */
+                    record.read(audioBuffer, 0, audioBuffer.size)
+                    Handler(Looper.getMainLooper()).post {
+                        /// Convert to list in order to send via EventChannel.
+                        val audioBufferList = ArrayList<Double>()
+                        for (impulse in audioBuffer) {
+                            val normalizedImpulse = impulse.toDouble() / maxAmplitude.toDouble()
+                            audioBufferList.add(normalizedImpulse)
+                        }
+                        eventSink!!.success(audioBufferList)
+                    }
+                }
+                record.stop()
+                record.release()
+            } catch (ex: java.lang.Exception) {
+                Log.e(logTag, "Audio Record threw exception! $ex")
             }
-            record.stop()
-            record.release()
         }).start()
     }
 }
